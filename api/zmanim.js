@@ -5,10 +5,11 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'City is required' });
   }
 
-  const url = `https://www.hebcal.com/zmanim?cfg=json&city=${encodeURIComponent(city)}`;
-
   try {
-    const response = await fetch(url);
+    const response = await fetch(
+      `https://www.hebcal.com/zmanim?cfg=json&city=${encodeURIComponent(city)}`
+    );
+
     const data = await response.json();
 
     if (!data.times) {

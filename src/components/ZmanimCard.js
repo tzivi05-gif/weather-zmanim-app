@@ -1,23 +1,23 @@
 import { useState } from 'react';
 
 function ZmanimCard() {
-  const [city, setCity] = useState('');
+  const [city, setCity] = useState('Brooklyn');
   const [zmanim, setZmanim] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchZmanim = async () => {
-    if (!city) return;
-
-    setLoading(true);
     setError(null);
+    setZmanim(null);
+    setLoading(true);
 
     try {
       const res = await fetch(`/api/zmanim?city=${encodeURIComponent(city)}`);
-
-      if (!res.ok) throw new Error('City not found');
-
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to load zmanim');
+      }
 
       setZmanim({
         city: data.location.title,
@@ -25,18 +25,19 @@ function ZmanimCard() {
       });
     } catch (err) {
       setError(err.message);
-      setZmanim(null);
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
-  const formatTime = (iso) =>
-    new Date(iso).toLocaleTimeString('en-US', {
+  const formatTime = (iso) => {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
     });
+  };
 
   return (
     <div style={{ border: '2px solid #673ab7', padding: 20, borderRadius: 8 }}>
@@ -49,10 +50,9 @@ function ZmanimCard() {
         style={{ padding: 8, marginRight: 8 }}
       />
 
-      <button onClick={fetchZmanim} disabled={loading}>
-        {loading ? 'Loading…' : 'Get Zmanim'}
-      </button>
+      <button onClick={fetchZmanim}>Get Zmanim</button>
 
+      {loading && <p>Loading…</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
       {zmanim && (
@@ -68,7 +68,7 @@ function ZmanimCard() {
               <tr><td>Mincha Gedola</td><td>{formatTime(zmanim.times.minchaGedola)}</td></tr>
               <tr><td>Plag HaMincha</td><td>{formatTime(zmanim.times.plagHaMincha)}</td></tr>
               <tr><td>Sunset</td><td>{formatTime(zmanim.times.sunset)}</td></tr>
-              <tr><td>Tzeit</td><td>{formatTime(zmanim.times.tzeit)}</td></tr>
+              <tr><td>Nightfall</td><td>{formatTime(zmanim.times.tzeit)}</td></tr>
             </tbody>
           </table>
         </>
