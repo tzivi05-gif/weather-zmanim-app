@@ -1,47 +1,40 @@
 import { useState } from 'react';
 
 function ZmanimCard() {
-  const [city, setCity] = useState('');
-  const [zmanim, setZmanim] = useState(null);
+  const [city, setCity] = useState('Brooklyn');
+  const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const fetchZmanim = async () => {
-    if (!city.trim()) {
-      setError('Please enter a city');
-      return;
-    }
-
-    setError(null);
-    setZmanim(null);
     setLoading(true);
+    setError(null);
+    setData(null);
 
     try {
       const res = await fetch(`/api/zmanim?city=${encodeURIComponent(city)}`);
-      const data = await res.json();
+      const json = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to load zmanim');
+        throw new Error(json.error || 'Failed to load zmanim');
       }
 
-      setZmanim(data);
+      setData(json);
     } catch (err) {
       setError(err.message);
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const formatTime = (iso) => {
     if (!iso) return '—';
-    const d = new Date(iso);
-    return isNaN(d)
-      ? '—'
-      : d.toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
-        });
+    return new Date(iso).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+      timeZone: data.timezone, // ✅ CITY TIMEZONE
+    });
   };
 
   return (
@@ -51,7 +44,7 @@ function ZmanimCard() {
       <input
         value={city}
         onChange={(e) => setCity(e.target.value)}
-        placeholder="Enter any city (e.g. Jerusalem)"
+        placeholder="Enter any city"
         style={{ padding: 8, marginRight: 8 }}
       />
 
@@ -60,24 +53,22 @@ function ZmanimCard() {
       {loading && <p>Loading…</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {zmanim && (
+      {data && (
         <>
-          <h3>{zmanim.city}</h3>
-          <p style={{ fontSize: 12, color: '#555' }}>
-            Timezone: {zmanim.timezone}
-          </p>
+          <h3>{data.city}</h3>
+          <p><strong>Timezone:</strong> {data.timezone}</p>
 
           <table>
             <tbody>
-              <tr><td>Alot Hashachar</td><td>{formatTime(zmanim.times.alotHaShachar)}</td></tr>
-              <tr><td>Sunrise</td><td>{formatTime(zmanim.times.sunrise)}</td></tr>
-              <tr><td>Latest Shema</td><td>{formatTime(zmanim.times.sofZmanShma)}</td></tr>
-              <tr><td>Latest Tefillah</td><td>{formatTime(zmanim.times.sofZmanTfilla)}</td></tr>
-              <tr><td>Chatzot</td><td>{formatTime(zmanim.times.chatzot)}</td></tr>
-              <tr><td>Mincha Gedola</td><td>{formatTime(zmanim.times.minchaGedola)}</td></tr>
-              <tr><td>Plag HaMincha</td><td>{formatTime(zmanim.times.plagHaMincha)}</td></tr>
-              <tr><td>Sunset</td><td>{formatTime(zmanim.times.sunset)}</td></tr>
-              <tr><td>Nightfall</td><td>{formatTime(zmanim.times.tzeit)}</td></tr>
+              <tr><td>Alot Hashachar</td><td>{formatTime(data.times.alotHaShachar)}</td></tr>
+              <tr><td>Sunrise</td><td>{formatTime(data.times.sunrise)}</td></tr>
+              <tr><td>Latest Shema</td><td>{formatTime(data.times.sofZmanShma)}</td></tr>
+              <tr><td>Latest Tefillah</td><td>{formatTime(data.times.sofZmanTfilla)}</td></tr>
+              <tr><td>Chatzot</td><td>{formatTime(data.times.chatzot)}</td></tr>
+              <tr><td>Mincha Gedola</td><td>{formatTime(data.times.minchaGedola)}</td></tr>
+              <tr><td>Plag HaMincha</td><td>{formatTime(data.times.plagHaMincha)}</td></tr>
+              <tr><td>Sunset</td><td>{formatTime(data.times.sunset)}</td></tr>
+              <tr><td>Nightfall (Tzeit)</td><td>{formatTime(data.times.tzeit)}</td></tr>
             </tbody>
           </table>
         </>
