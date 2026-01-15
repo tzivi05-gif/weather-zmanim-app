@@ -6,40 +6,32 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 1) City → Lat/Lon
+    // 🌍 1) City → Lat/Lon (Geoapify)
+    const geoKey = process.env.GEOAPIFY_KEY;
+    if (!geoKey) throw new Error('Missing GEOAPIFY_KEY');
+
     const geoRes = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(city)}`,
-      { headers: { 'User-Agent': 'weather-zmanim-app' } }
+      `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(city)}&limit=1&apiKey=${geoKey}`
     );
 
-    if (!geoRes.ok) throw new Error('Geocoding failed');
     const geoData = await geoRes.json();
-    if (!geoData.length) throw new Error('City not found');
+    if (!geoData.features?.length) throw new Error('City not found');
 
-    const { lat, lon, display_name } = geoData[0];
+    const place = geoData.features[0];
+    const lat = place.properties.lat;
+    const lon = place.properties.lon;
+    const cityName = place.properties.formatted;
 
-    // 2) Lat/Lon → Timezone
-    const tzKey = process.env.TIMEZONEDB_KEY;
-    if (!tzKey) throw new Error('Missing TIMEZONEDB_KEY');
-
-    const tzRes = await fetch(
-      `https://api.timezonedb.com/v2.1/get-time-zone?format=json&by=position&lat=${lat}&lng=${lon}&key=${tzKey}`
-    );
-
-    const tzData = await tzRes.json();
-    if (!tzData.zoneName) throw new Error('Timezone lookup failed');
-
-    // 3) Zmanim
+    // 🕒 2) Hebcal Zmanim — timezone AUTO by lat/lon
     const zmanimRes = await fetch(
-      `https://www.hebcal.com/zmanim?cfg=json&latitude=${lat}&longitude=${lon}&tzid=${tzData.zoneName}`
+      `https://www.hebcal.com/zmanim?cfg=json&latitude=${lat}&longitude=${lon}`
     );
 
     const zmanimData = await zmanimRes.json();
-    if (!zmanimData.times) throw new Error('Zmanim fetch failed');
+    if (!zmanimData.times) throw new Error('Failed to fetch zmanim');
 
     res.status(200).json({
-      city: display_name,
-      timezone: tzData.zoneName,
+      city: cityName,
       times: zmanimData.times,
     });
   } catch (err) {
