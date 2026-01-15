@@ -1,36 +1,27 @@
 export default async function handler(req, res) {
   const { city } = req.query;
-  if (!city) return res.status(400).json({ error: 'City is required' });
+
+  if (!city) {
+    return res.status(400).json({ error: 'City is required' });
+  }
 
   try {
-    // 1️⃣ City → Lat/Lon (OpenStreetMap)
-    const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(city)}`;
-    const geoRes = await fetch(geoUrl, {
-      headers: { 'User-Agent': 'weather-zmanim-app' }
-    });
+    const url = `https://www.hebcal.com/zmanim?cfg=json&city=${encodeURIComponent(city)}`;
+    const response = await fetch(url);
 
-    if (!geoRes.ok) throw new Error('Geocoding failed');
+    if (!response.ok) {
+      throw new Error('Hebcal request failed');
+    }
 
-    const geoData = await geoRes.json();
-    if (!geoData.length) throw new Error('City not found');
+    const data = await response.json();
 
-    const { lat, lon, display_name } = geoData[0];
+    if (!data.times) {
+      throw new Error('No zmanim returned');
+    }
 
-    // 2️⃣ Hebcal Zmanim (Hebcal handles timezone automatically)
-    const zmanimUrl = `https://www.hebcal.com/zmanim?cfg=json&latitude=${lat}&longitude=${lon}`;
-    const zmanimRes = await fetch(zmanimUrl);
-
-    if (!zmanimRes.ok) throw new Error('Hebcal request failed');
-
-    const zmanimData = await zmanimRes.json();
-    if (!zmanimData.times) throw new Error('Zmanim missing');
-
-    res.status(200).json({
-      city: display_name,
-      times: zmanimData.times
-    });
+    res.status(200).json(data);
   } catch (err) {
-    console.error('Zmanim API error:', err.message);
+    console.error('Zmanim API error:', err);
     res.status(500).json({ error: 'Failed to fetch zmanim' });
   }
 }
