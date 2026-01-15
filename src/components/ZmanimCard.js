@@ -1,25 +1,25 @@
 import { useState } from 'react';
 
 function ZmanimCard() {
-  const [city, setCity] = useState('Brooklyn');
-  const [data, setData] = useState(null);
+  const [city, setCity] = useState('');
+  const [zmanim, setZmanim] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const fetchZmanim = async () => {
-    setLoading(true);
     setError(null);
-    setData(null);
+    setZmanim(null);
+    setLoading(true);
 
     try {
       const res = await fetch(`/api/zmanim?city=${encodeURIComponent(city)}`);
-      const json = await res.json();
+      const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(json.error || 'Failed to load zmanim');
+        throw new Error(data.error || 'Failed to load zmanim');
       }
 
-      setData(json);
+      setZmanim(data);
     } catch (err) {
       setError(err.message);
     }
@@ -33,7 +33,6 @@ function ZmanimCard() {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
-      timeZone: data.timezone, // ✅ CITY TIMEZONE
     });
   };
 
@@ -53,22 +52,24 @@ function ZmanimCard() {
       {loading && <p>Loading…</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {data && (
+      {zmanim && (
         <>
-          <h3>{data.city}</h3>
-          <p><strong>Timezone:</strong> {data.timezone}</p>
+          <h3>{zmanim.location.title}</h3>
+          <p style={{ fontSize: 12 }}>
+            Timezone: {zmanim.location.timezone}
+          </p>
 
           <table>
             <tbody>
-              <tr><td>Alot Hashachar</td><td>{formatTime(data.times.alotHaShachar)}</td></tr>
-              <tr><td>Sunrise</td><td>{formatTime(data.times.sunrise)}</td></tr>
-              <tr><td>Latest Shema</td><td>{formatTime(data.times.sofZmanShma)}</td></tr>
-              <tr><td>Latest Tefillah</td><td>{formatTime(data.times.sofZmanTfilla)}</td></tr>
-              <tr><td>Chatzot</td><td>{formatTime(data.times.chatzot)}</td></tr>
-              <tr><td>Mincha Gedola</td><td>{formatTime(data.times.minchaGedola)}</td></tr>
-              <tr><td>Plag HaMincha</td><td>{formatTime(data.times.plagHaMincha)}</td></tr>
-              <tr><td>Sunset</td><td>{formatTime(data.times.sunset)}</td></tr>
-              <tr><td>Nightfall (Tzeit)</td><td>{formatTime(data.times.tzeit)}</td></tr>
+              <tr><td>Alot Hashachar</td><td>{formatTime(zmanim.times.alotHaShachar)}</td></tr>
+              <tr><td>Sunrise</td><td>{formatTime(zmanim.times.sunrise)}</td></tr>
+              <tr><td>Latest Shema</td><td>{formatTime(zmanim.times.sofZmanShma)}</td></tr>
+              <tr><td>Latest Tefillah</td><td>{formatTime(zmanim.times.sofZmanTfilla)}</td></tr>
+              <tr><td>Chatzot</td><td>{formatTime(zmanim.times.chatzot)}</td></tr>
+              <tr><td>Mincha Gedola</td><td>{formatTime(zmanim.times.minchaGedola)}</td></tr>
+              <tr><td>Plag HaMincha</td><td>{formatTime(zmanim.times.plagHaMincha)}</td></tr>
+              <tr><td>Sunset</td><td>{formatTime(zmanim.times.sunset)}</td></tr>
+              <tr><td><strong>Nightfall</strong></td><td><strong>{formatTime(zmanim.times.tzeit)}</strong></td></tr>
             </tbody>
           </table>
         </>
