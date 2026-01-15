@@ -1,12 +1,17 @@
 import { useState } from 'react';
 
 function ZmanimCard() {
-  const [city, setCity] = useState('Brooklyn');
+  const [city, setCity] = useState('');
   const [zmanim, setZmanim] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const fetchZmanim = async () => {
+    if (!city.trim()) {
+      setError('Please enter a city');
+      return;
+    }
+
     setError(null);
     setZmanim(null);
     setLoading(true);
@@ -19,24 +24,24 @@ function ZmanimCard() {
         throw new Error(data.error || 'Failed to load zmanim');
       }
 
-      setZmanim({
-        city: data.location.title,
-        times: data.times,
-      });
+      setZmanim(data);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const formatTime = (iso) => {
     if (!iso) return '—';
-    return new Date(iso).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
+    const d = new Date(iso);
+    return isNaN(d)
+      ? '—'
+      : d.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+        });
   };
 
   return (
@@ -46,7 +51,7 @@ function ZmanimCard() {
       <input
         value={city}
         onChange={(e) => setCity(e.target.value)}
-        placeholder="Enter any city"
+        placeholder="Enter any city (e.g. Jerusalem)"
         style={{ padding: 8, marginRight: 8 }}
       />
 
@@ -58,6 +63,10 @@ function ZmanimCard() {
       {zmanim && (
         <>
           <h3>{zmanim.city}</h3>
+          <p style={{ fontSize: 12, color: '#555' }}>
+            Timezone: {zmanim.timezone}
+          </p>
+
           <table>
             <tbody>
               <tr><td>Alot Hashachar</td><td>{formatTime(zmanim.times.alotHaShachar)}</td></tr>
