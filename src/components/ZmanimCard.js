@@ -15,7 +15,6 @@ function ZmanimCard() {
     try {
       const res = await fetch(`/api/zmanim?city=${encodeURIComponent(city)}`);
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error || 'Failed to fetch zmanim');
 
       setZmanim(data);
@@ -26,42 +25,38 @@ function ZmanimCard() {
     setLoading(false);
   };
 
-  // ✅ CORRECT timezone formatting using Hebcal tzid
   const formatTime = (iso) => {
-    if (!iso || !zmanim?.timezone) return '—';
-
-    const d = new Date(iso);
-    return d.toLocaleTimeString('en-US', {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
-      timeZone: zmanim.timezone, // 🔥 THIS fixes timezone permanently
     });
   };
 
   return (
     <div className="card">
-      <h2>🕍 Zmanim by City</h2>
+      <h2>🕍 Zmanim</h2>
 
-      <input
-        value={city}
-        onChange={(e) => setCity(e.target.value)}
-        placeholder="Enter any city"
-      />
-
-      <button onClick={fetchZmanim} disabled={loading}>
-        {loading ? 'Loading…' : 'Get Zmanim'}
-      </button>
+      <div className="input-row">
+        <input
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="Enter city"
+        />
+        <button onClick={fetchZmanim} disabled={loading}>
+          {loading ? 'Loading…' : 'Get Zmanim'}
+        </button>
+      </div>
 
       {error && <p className="error">❌ {error}</p>}
-      {loading && <p>Loading…</p>}
 
       {zmanim && (
-        <>
-          <h3>{zmanim.city}</h3>
-          <p className="timezone">Timezone: {zmanim.timezone}</p>
+        <div className="details">
+          <h3>{zmanim.location?.title || city}</h3>
+          <p className="subtle">Timezone: {zmanim.location?.tzid || '—'}</p>
 
-          <table>
+          <table className="zmanim-table">
             <tbody>
               <tr><td>Alot Hashachar</td><td>{formatTime(zmanim.times.alotHaShachar)}</td></tr>
               <tr><td>Sunrise</td><td>{formatTime(zmanim.times.sunrise)}</td></tr>
@@ -74,7 +69,7 @@ function ZmanimCard() {
               <tr><td>Nightfall (Tzeit)</td><td>{formatTime(zmanim.times.tzeit)}</td></tr>
             </tbody>
           </table>
-        </>
+        </div>
       )}
     </div>
   );
