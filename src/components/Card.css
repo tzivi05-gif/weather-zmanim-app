@@ -1,3 +1,48 @@
+.card {
+  background: linear-gradient(135deg, #ffffff, #f4f3ff);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 700px;
+  margin: 24px auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.card .left,
+.card .right {
+  flex: 1;
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.input-row input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.input-row button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #6d28d9;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.weather-icon {
+  display: block;
+  margin: 0 auto 10px;
+}
+
 .grid {
   margin-top: 16px;
   display: flex;
@@ -5,9 +50,8 @@
   gap: 8px;
 }
 
-.grid .row {
+.weather-row {
   display: flex;
-  flex-direction: row;        /* ⬅ THIS is key */
   justify-content: space-between;
   align-items: center;
   font-size: 1rem;
@@ -15,12 +59,36 @@
   border-bottom: 1px solid #eee;
 }
 
-.grid .row span:first-child {
+.weather-row span:first-child {
   font-weight: 500;
   color: #374151;
 }
 
-.grid .row span:last-child {
+.weather-row span:last-child {
   font-weight: 600;
   color: #111827;
+}
+
+.error {
+  color: #dc2626;
+  margin-top: 8px;
+}
+
+.subtle {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+  .card {
+    flex-direction: column;
+  }
+
+  .input-row {
+    flex-direction: column;
+  }
+
+  .input-row button {
+    width: 100%;
+  }
 }
