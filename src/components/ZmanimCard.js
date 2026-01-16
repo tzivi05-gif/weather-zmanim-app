@@ -14,16 +14,11 @@ function ZmanimCard() {
 
     try {
       const res = await fetch(`/api/zmanim?city=${encodeURIComponent(city)}`);
-      if (!res.ok) throw new Error('Hebcal request failed');
-
       const data = await res.json();
-      if (!data.times) throw new Error('No zmanim returned');
 
-      setZmanim({
-        city: data.location?.title || city,
-        timezone: data.location?.tzid || 'Unknown',
-        times: data.times,
-      });
+      if (!res.ok) throw new Error(data.error || 'Failed to fetch zmanim');
+
+      setZmanim(data);
     } catch (err) {
       setError(err.message);
     }
@@ -31,12 +26,16 @@ function ZmanimCard() {
     setLoading(false);
   };
 
+  // ✅ CORRECT timezone formatting using Hebcal tzid
   const formatTime = (iso) => {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleTimeString('en-US', {
+    if (!iso || !zmanim?.timezone) return '—';
+
+    const d = new Date(iso);
+    return d.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
+      timeZone: zmanim.timezone, // 🔥 THIS fixes timezone permanently
     });
   };
 
