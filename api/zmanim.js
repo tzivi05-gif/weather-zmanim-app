@@ -1,21 +1,26 @@
 export default async function handler(req, res) {
-  const city = req.query.city;
-
-  if (!city) {
-    return res.status(400).json({ error: 'City is required' });
-  }
-
   try {
-    // Force better city format
-    const cityQuery = city.includes(',') ? city : `${city},NY`;
+    const city = req.query.city || 'New York';
 
-    const url = `https://www.hebcal.com/zmanim?cfg=json&city=${encodeURIComponent(cityQuery)}`;
+    // Map city → geonameid (you can add more later)
+    const cityMap = {
+      'brooklyn': '5128581',
+      'new york': '5128581',
+      'nyc': '5128581',
+      'jerusalem': '281184',
+      'lakewood': '5100280'
+    };
+
+    const key = city.toLowerCase().trim();
+    const geonameid = cityMap[key] || '5128581'; // default NYC
+
+    const url = `https://www.hebcal.com/zmanim?cfg=json&geonameid=${geonameid}`;
 
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'zmanim-app',
         'Accept': 'application/json'
-      },
+      }
     });
 
     if (!response.ok) {
@@ -26,7 +31,7 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (!data.times) {
-      console.error('No times returned:', data);
+      console.error('Hebcal returned no times:', data);
       return res.status(404).json({ error: 'No zmanim returned' });
     }
 
