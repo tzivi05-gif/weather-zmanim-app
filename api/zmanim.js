@@ -6,13 +6,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const today = new Date().toISOString().split('T')[0];
+    // Force better city format
+    const cityQuery = city.includes(',') ? city : `${city},NY`;
 
-    const url = `https://www.hebcal.com/zmanim?cfg=json&city=${encodeURIComponent(city)}&date=${today}`;
+    const url = `https://www.hebcal.com/zmanim?cfg=json&city=${encodeURIComponent(cityQuery)}`;
 
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'zmanim-app',
+        'Accept': 'application/json'
       },
     });
 
