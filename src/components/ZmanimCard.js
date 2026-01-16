@@ -15,23 +15,20 @@ function ZmanimCard() {
     try {
       const res = await fetch(`/api/zmanim?city=${encodeURIComponent(city)}`);
       const data = await res.json();
+      console.log("ZMANIM API RESPONSE:", data);
 
       if (!res.ok) throw new Error(data.error || 'Failed to fetch zmanim');
-
       setZmanim(data);
     } catch (err) {
-      setError(err.message || 'Error loading zmanim');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const formatTime = (value) => {
-    if (!value) return '—';
-    const date = new Date(value);
-    if (isNaN(date)) return '—';
-
-    return date.toLocaleTimeString('en-US', {
+  const formatTime = (iso) => {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
@@ -58,28 +55,25 @@ function ZmanimCard() {
       </div>
 
       <div className="right">
-        {loading && <p className="subtle">Loading zmanim…</p>}
-
         {zmanim && (
           <>
             <h3>{zmanim.city}</h3>
             <p className="timezone">Timezone: {zmanim.timezone}</p>
 
             <table className="zmanim-table">
-  <tbody>
-    <tr><td>Alot Hashachar</td><td>{formatTime(zmanim.times.alot)}</td></tr>
-    <tr><td>Sunrise</td><td>{formatTime(zmanim.times.sunrise)}</td></tr>
-    <tr><td>Latest Shema</td><td>{formatTime(zmanim.times.sof_zman_shma)}</td></tr>
-    <tr><td>Latest Tefillah</td><td>{formatTime(zmanim.times.sof_zman_tfila)}</td></tr>
-    <tr><td>Chatzot</td><td>{formatTime(zmanim.times.chatzot)}</td></tr>
-    <tr><td>Mincha Gedola</td><td>{formatTime(zmanim.times.mincha_gedola)}</td></tr>
-    <tr><td>Plag HaMincha</td><td>{formatTime(zmanim.times.plag_hamincha)}</td></tr>
-    <tr><td>Sunset</td><td>{formatTime(zmanim.times.sunset)}</td></tr>
-    <tr><td>Nightfall (Tzeit)</td><td>{formatTime(zmanim.times.tzeit)}</td></tr>
-  </tbody>
-</table>
-
-                      </>
+              <tbody>
+                <tr><td>Alot Hashachar</td><td>{formatTime(zmanim.times.alot)}</td></tr>
+                <tr><td>Sunrise</td><td>{formatTime(zmanim.times.sunrise)}</td></tr>
+                <tr><td>Latest Shema</td><td>{formatTime(zmanim.times.sof_zman_shma)}</td></tr>
+                <tr><td>Latest Tefillah</td><td>{formatTime(zmanim.times.sof_zman_tfila)}</td></tr>
+                <tr><td>Chatzot</td><td>{formatTime(zmanim.times.chatzot)}</td></tr>
+                <tr><td>Mincha Gedola</td><td>{formatTime(zmanim.times.mincha_gedola)}</td></tr>
+                <tr><td>Plag HaMincha</td><td>{formatTime(zmanim.times.plag_hamincha)}</td></tr>
+                <tr><td>Sunset</td><td>{formatTime(zmanim.times.sunset)}</td></tr>
+                <tr><td>Nightfall (Tzeit)</td><td>{formatTime(zmanim.times.tzeit)}</td></tr>
+              </tbody>
+            </table>
+          </>
         )}
       </div>
     </div>
