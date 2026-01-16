@@ -124,7 +124,7 @@
   flex: 1 1 0;
   min-width: 0;             /* ⬅ important for flex shrink */
 }
-ard {
+.card {
   display: flex !important;
   flex-direction: row !important;
   align-items: flex-start !important;
