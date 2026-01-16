@@ -113,3 +113,25 @@
     width: 100%;
   }
 }
+.card {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;   /* ⬅ change from center */
+}
+
+.card .left,
+.card .right {
+  flex: 1 1 0;
+  min-width: 0;             /* ⬅ important for flex shrink */
+}
+ard {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+}
+
+.card > .left,
+.card > .right {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+}
