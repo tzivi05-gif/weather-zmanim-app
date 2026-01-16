@@ -13,10 +13,7 @@ function ZmanimCard() {
     setZmanim(null);
 
     try {
-      const res = await fetch(
-        `https://www.hebcal.com/zmanim?cfg=json&city=${encodeURIComponent(city)}`
-      );
-
+      const res = await fetch(`/api/zmanim?city=${encodeURIComponent(city)}`);
       if (!res.ok) throw new Error('Hebcal request failed');
 
       const data = await res.json();
