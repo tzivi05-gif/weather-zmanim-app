@@ -66,6 +66,12 @@ function WeatherCard() {
       </div>
 
       <div className="right">
+        {loading && <p className="subtle">Loading weather…</p>}
+
+        {!loading && !weather && !error && (
+          <p className="subtle">➡️ Search for a city to see the weather</p>
+        )}
+
         {weather && (
           <>
             <h3>{weather.name}</h3>
