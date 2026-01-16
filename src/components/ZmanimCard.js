@@ -15,14 +15,12 @@ function ZmanimCard() {
     try {
       const res = await fetch(`/api/zmanim?city=${encodeURIComponent(city)}`);
       const data = await res.json();
-      console.log("CLIENT ZMANIM RESPONSE:", data);
+
+      console.log('CLIENT ZMANIM RESPONSE:', data);
 
       if (!res.ok) throw new Error(data.error || 'Failed to fetch zmanim');
-      if (!data.times) throw new Error('No zmanim returned');
-
       setZmanim(data);
     } catch (err) {
-      console.error("Zmanim fetch error:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -31,8 +29,7 @@ function ZmanimCard() {
 
   const formatTime = (iso) => {
     if (!iso) return '—';
-    const d = new Date(iso);
-    return isNaN(d) ? '—' : d.toLocaleTimeString('en-US', {
+    return new Date(iso).toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
@@ -59,10 +56,9 @@ function ZmanimCard() {
       </div>
 
       <div className="right">
-        {zmanim && (
+        {zmanim && zmanim.times && (
           <>
-            <h3>{zmanim.location?.city || 'Location'}</h3>
-            <p className="timezone">Timezone: {zmanim.location?.tzid}</p>
+            <h3>{zmanim.location?.city || city}</h3>
 
             <table className="zmanim-table">
               <tbody>
