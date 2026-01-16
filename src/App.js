@@ -1,5 +1,5 @@
-import WeatherCard from './WeatherCard';
-import ZmanimCard from './ZmanimCard';
+import WeatherCard from './components/WeatherCard';
+import ZmanimCard from './components/ZmanimCard';
 import './App.css';
 
 export default function App() {
