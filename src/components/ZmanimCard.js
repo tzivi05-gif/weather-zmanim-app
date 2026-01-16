@@ -18,8 +18,11 @@ function ZmanimCard() {
       console.log("ZMANIM API RESPONSE:", data);
 
       if (!res.ok) throw new Error(data.error || 'Failed to fetch zmanim');
+      if (!data.times) throw new Error('No zmanim returned');
+
       setZmanim(data);
     } catch (err) {
+      console.error(err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -28,7 +31,8 @@ function ZmanimCard() {
 
   const formatTime = (iso) => {
     if (!iso) return '—';
-    return new Date(iso).toLocaleTimeString('en-US', {
+    const d = new Date(iso);
+    return isNaN(d) ? '—' : d.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
@@ -57,20 +61,20 @@ function ZmanimCard() {
       <div className="right">
         {zmanim && (
           <>
-            <h3>{zmanim.city}</h3>
-            <p className="timezone">Timezone: {zmanim.timezone}</p>
+            <h3>{zmanim.location?.city || 'Location'}</h3>
+            <p className="timezone">Timezone: {zmanim.location?.tzid}</p>
 
             <table className="zmanim-table">
               <tbody>
-                <tr><td>Alot Hashachar</td><td>{formatTime(zmanim.times.alot)}</td></tr>
+                <tr><td>Alot Hashachar</td><td>{formatTime(zmanim.times.alotHaShachar)}</td></tr>
                 <tr><td>Sunrise</td><td>{formatTime(zmanim.times.sunrise)}</td></tr>
-                <tr><td>Latest Shema</td><td>{formatTime(zmanim.times.sof_zman_shma)}</td></tr>
-                <tr><td>Latest Tefillah</td><td>{formatTime(zmanim.times.sof_zman_tfila)}</td></tr>
+                <tr><td>Latest Shema</td><td>{formatTime(zmanim.times.sofZmanShma)}</td></tr>
+                <tr><td>Latest Tefillah</td><td>{formatTime(zmanim.times.sofZmanTfilla)}</td></tr>
                 <tr><td>Chatzot</td><td>{formatTime(zmanim.times.chatzot)}</td></tr>
-                <tr><td>Mincha Gedola</td><td>{formatTime(zmanim.times.mincha_gedola)}</td></tr>
-                <tr><td>Plag HaMincha</td><td>{formatTime(zmanim.times.plag_hamincha)}</td></tr>
+                <tr><td>Mincha Gedola</td><td>{formatTime(zmanim.times.minchaGedola)}</td></tr>
+                <tr><td>Plag HaMincha</td><td>{formatTime(zmanim.times.plagHaMincha)}</td></tr>
                 <tr><td>Sunset</td><td>{formatTime(zmanim.times.sunset)}</td></tr>
-                <tr><td>Nightfall (Tzeit)</td><td>{formatTime(zmanim.times.tzeit)}</td></tr>
+                <tr><td>Nightfall (Tzeit)</td><td>{formatTime(zmanim.times.tzeit7083deg)}</td></tr>
               </tbody>
             </table>
           </>
