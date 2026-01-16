@@ -6,7 +6,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const url = `https://www.hebcal.com/zmanim?cfg=json&city=${encodeURIComponent(city)}`;
+    // Use Hebcal's "location" param instead of "city"
+    const url = `https://www.hebcal.com/zmanim?cfg=json&location=${encodeURIComponent(city)}`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -19,7 +20,10 @@ export default async function handler(req, res) {
       throw new Error('No zmanim returned');
     }
 
-    res.status(200).json(data);
+    res.status(200).json({
+      city: data.location?.name || city,
+      times: data.times,
+    });
   } catch (err) {
     console.error('Zmanim API error:', err);
     res.status(500).json({ error: 'Failed to fetch zmanim' });
