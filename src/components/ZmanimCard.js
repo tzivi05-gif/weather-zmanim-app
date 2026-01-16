@@ -15,18 +15,26 @@ function ZmanimCard() {
     try {
       const res = await fetch(`/api/zmanim?city=${encodeURIComponent(city)}`);
       const data = await res.json();
+
       if (!res.ok) throw new Error(data.error || 'Failed to fetch zmanim');
+
+      console.log('Zmanim API data:', data); // 👈 keep for debugging
+
       setZmanim(data);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Error loading zmanim');
     } finally {
       setLoading(false);
     }
   };
 
-  const formatTime = (iso) => {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleTimeString('en-US', {
+  const formatTime = (value) => {
+    if (!value) return '—';
+
+    const date = new Date(value);
+    if (isNaN(date)) return '—';
+
+    return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
@@ -53,6 +61,8 @@ function ZmanimCard() {
       </div>
 
       <div className="right">
+        {loading && <p className="subtle">Loading zmanim…</p>}
+
         {zmanim && (
           <>
             <h3>{zmanim.city}</h3>
@@ -63,7 +73,7 @@ function ZmanimCard() {
                 <tr><td>Alot Hashachar</td><td>{formatTime(zmanim.times.alotHaShachar)}</td></tr>
                 <tr><td>Sunrise</td><td>{formatTime(zmanim.times.sunrise)}</td></tr>
                 <tr><td>Latest Shema</td><td>{formatTime(zmanim.times.sofZmanShma)}</td></tr>
-                <tr><td>Latest Tefillah</td><td>{formatTime(zmanim.times.sofZmanTfilla)}</td></tr>
+                <tr><td>Latest Tefillah</td><td>{formatTime(zmanim.times.sofZmanTfila)}</td></tr>
                 <tr><td>Chatzot</td><td>{formatTime(zmanim.times.chatzot)}</td></tr>
                 <tr><td>Mincha Gedola</td><td>{formatTime(zmanim.times.minchaGedola)}</td></tr>
                 <tr><td>Plag HaMincha</td><td>{formatTime(zmanim.times.plagHaMincha)}</td></tr>
