@@ -100,7 +100,7 @@
 }
 
 /* 📱 Mobile */
-@media (max-width: 700px) {
+@media (max-width: 480px) {
   .card {
     flex-direction: column;
   }
