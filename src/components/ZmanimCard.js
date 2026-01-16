@@ -16,7 +16,6 @@ function ZmanimCard() {
       const res = await fetch(`/api/zmanim?city=${encodeURIComponent(city)}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to fetch zmanim');
-
       setZmanim(data);
     } catch (err) {
       setError(err.message);
@@ -52,9 +51,9 @@ function ZmanimCard() {
       {error && <p className="error">❌ {error}</p>}
 
       {zmanim && (
-        <div className="details">
-          <h3>{zmanim.location?.title || city}</h3>
-          <p className="subtle">Timezone: {zmanim.location?.tzid || '—'}</p>
+        <>
+          <h3>{zmanim.city}</h3>
+          <p className="timezone">Timezone: {zmanim.timezone}</p>
 
           <table className="zmanim-table">
             <tbody>
@@ -69,7 +68,7 @@ function ZmanimCard() {
               <tr><td>Nightfall (Tzeit)</td><td>{formatTime(zmanim.times.tzeit)}</td></tr>
             </tbody>
           </table>
-        </div>
+        </>
       )}
     </div>
   );
