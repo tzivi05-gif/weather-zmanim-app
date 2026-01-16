@@ -15,8 +15,8 @@ function ZmanimCard() {
     try {
       const res = await fetch(`/api/zmanim?city=${encodeURIComponent(city)}`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to fetch zmanim');
 
+      if (!res.ok) throw new Error(data.error || 'Failed to fetch zmanim');
       setZmanim(data);
     } catch (err) {
       setError(err.message);
@@ -54,7 +54,6 @@ function ZmanimCard() {
       {zmanim && (
         <>
           <h3>{zmanim.city}</h3>
-          <p className="timezone">Timezone: {zmanim.timezone}</p>
 
           <table>
             <tbody>
