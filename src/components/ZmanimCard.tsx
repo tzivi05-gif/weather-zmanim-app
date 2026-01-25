@@ -1,9 +1,29 @@
 import { useState } from 'react';
 import './Card.css';
 
+type ZmanimTimes = {
+  alotHaShachar?: string;
+  sunrise?: string;
+  sofZmanShma?: string;
+  sofZmanTfilla?: string;
+  chatzot?: string;
+  minchaGedola?: string;
+  plagHaMincha?: string;
+  sunset?: string;
+  tzeit7083deg?: string;
+};
+
+type ZmanimResponse = {
+  location?: {
+    city?: string;
+  };
+  times?: ZmanimTimes;
+  error?: string;
+};
+
 function ZmanimCard() {
   const [city, setCity] = useState('Brooklyn');
-  const [zmanim, setZmanim] = useState(null);
+  const [zmanim, setZmanim] = useState<ZmanimResponse | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -14,20 +34,21 @@ function ZmanimCard() {
 
     try {
       const res = await fetch(`/api/zmanim?city=${encodeURIComponent(city)}`);
-      const data = await res.json();
+      const data = (await res.json()) as ZmanimResponse;
 
       console.log('CLIENT ZMANIM RESPONSE:', data);
 
       if (!res.ok) throw new Error(data.error || 'Failed to fetch zmanim');
       setZmanim(data);
     } catch (err) {
-      setError(err.message);
+      const message = err instanceof Error ? err.message : 'Failed to fetch zmanim';
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-  const formatTime = (iso) => {
+  const formatTime = (iso?: string) => {
     if (!iso) return '—';
     return new Date(iso).toLocaleTimeString('en-US', {
       hour: 'numeric',

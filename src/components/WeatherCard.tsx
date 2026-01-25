@@ -2,8 +2,24 @@ import { useState, useEffect } from 'react';
 import { HDate } from '@hebcal/core';
 import './Card.css';
 
+type WeatherData = {
+  name: string;
+  weather: Array<{
+    icon: string;
+    description: string;
+  }>;
+  main: {
+    temp: number;
+    feels_like: number;
+    humidity: number;
+  };
+  wind: {
+    speed: number;
+  };
+};
+
 function WeatherCard() {
-  const [weather, setWeather] = useState(null);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(false);
   const [city, setCity] = useState('');
   const [error, setError] = useState('');
@@ -28,15 +44,19 @@ function WeatherCard() {
         throw new Error('Missing OpenWeather API key');
       }
       const res = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=imperial`
+        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
+          city
+        )}&appid=${API_KEY}&units=imperial`
       );
 
       if (!res.ok) throw new Error('City not found');
 
-      const data = await res.json();
+      const data = (await res.json()) as WeatherData;
       setWeather(data);
     } catch (err) {
-      setError(err.message || 'Failed to fetch weather');
+      const message =
+        err instanceof Error ? err.message : 'Failed to fetch weather';
+      setError(message);
     } finally {
       setLoading(false);
     }
