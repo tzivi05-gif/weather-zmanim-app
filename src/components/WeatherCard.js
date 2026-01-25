@@ -9,7 +9,7 @@ function WeatherCard() {
   const [error, setError] = useState('');
   const [hebrewDate, setHebrewDate] = useState('');
 
-  const API_KEY = import.meta.env.VITE_OPENWEATHER_KEY;
+  const API_KEY = process.env.REACT_APP_OPENWEATHER_KEY;
 
   useEffect(() => {
     const hd = new HDate();
@@ -24,6 +24,9 @@ function WeatherCard() {
     setWeather(null);
 
     try {
+      if (!API_KEY) {
+        throw new Error('Missing OpenWeather API key');
+      }
       const res = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=imperial`
       );
